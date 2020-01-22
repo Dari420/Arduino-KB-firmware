@@ -16,6 +16,7 @@ const int pinLed3 = 15; //scrolllock
 byte rowPins[ROWS] = {9, 8}; //pin arrays
 byte colPins[COLS] = {5, 4, 3};
 const int message_strings = 6 //enter the amount of string entries you have 
+const int functions = 2 //enter the amount of functions you have
 
 /* to change your keymap, edit this. valid numbers are 0-5 for text, and 6-11 for functions. 
 Simply follow the formulas to find which number you want to put. Function/String number can be found in the arrays. For functions, formula is 6 + function number
@@ -67,10 +68,10 @@ int customKey = customKeypad.getKey();
 
 //Main macro 
 void Macro(int i) {
-  if (i <= 6) {
+  if (i <= message_strings) {
   Keyboard.print(messages[i - 1]); //minus 1 because arrays are zero-indexed
   }
-  else if (i <= (6 + 2)) { //output is under or equivalent to the maxmimum amount of valid entries (functions + strings), so that there's no memory errors.
+  else if (i <= (message_strings + functions)) { //output is under or equivalent to the maxmimum amount of valid entries (functions + strings), so that there's no memory errors.
     funcMacros[i - (message_strings + 1)]();  /*Subtracting away the string numbers so that it correctly finds the corresponding function in the array funcMacros. 
                                           Additionally subtracing one more than the number of strings because arrays are 0 indexed
 										 */
