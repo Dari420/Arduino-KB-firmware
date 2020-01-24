@@ -7,7 +7,7 @@
 #include <Keypad.h>
 
 //Defining pins, self explanatory
-const int debounce = 300 //ms of debounce time, change to whatever
+const int debounce = 200 //ms of debounce time, change to whatever
 const byte ROWS = 2; //Rows, horizontal, edit for your own use
 const byte COLS = 3; //Columns, vertical, edit for your own use
 const int pinLed = 10; //capslock
@@ -16,7 +16,7 @@ const int pinLed3 = 15; //scrolllock
 byte rowPins[ROWS] = {9, 8}; //pin arrays
 byte colPins[COLS] = {5, 4, 3};
 const int message_strings = 6 //enter the amount of string entries you have 
-const int functions = 2 //enter the amount of functions you have
+const int functions = 3 //enter the amount of functions you have
 
 /* to change your keymap, edit this. valid numbers are 0-5 for text, and 6-11 for functions. 
 Simply follow the formulas to find which number you want to put. Function/String number can be found in the arrays. For functions, formula is 6 + function number
@@ -49,13 +49,34 @@ void sleep() {
   Keyboard.press('s');
   Keyboard.releaseAll();
 }
-void placeholder() {
-  int placeholder = 69;
+
+void PsFill() {
+  Keyboard.press(KEY_LEFT_SHIFT);
+  Keyboard.press(KEY_F5);
+  Keyboard.releaseAll();
 }
 
+void VolumeUp() {
+  Keyboard.press(KEY_F24);
+  Keyboard.releaseAll();
+}
+
+void VolumeDown(){
+  Keyboard.press(KEY_F23);
+  Keyboard.releaseAll();
+}
+void RecordStart(){
+  Keyboard.press(KEY_F22):
+  Keyboard.releaseAll();
+}
+
+void RecordStop(){
+  Keyboard.press(KEY_F21);
+  Keyboard.releaseAll();
+}
 // Function array, order your functions here, not super useful but if you need it it's here. Read the keymap for a better explanation
 void (*funcMacros[2])() {
-  sleep, placeholder
+  sleep, PsFill, VolumeUp, VolumeDown, Record, RecordStop
 };
 
 // anything after this is more technical, feel free to read
@@ -72,8 +93,9 @@ void Macro(int i) {
   Keyboard.print(messages[i - 1]); //minus 1 because arrays are zero-indexed
   }
   else if (i <= (message_strings + functions)) { //output is under or equivalent to the maxmimum amount of valid entries (functions + strings), so that there's no memory errors.
-    funcMacros[i - (message_strings + 1)]();  /*Subtracting away the string numbers so that it correctly finds the corresponding function in the array funcMacros. 
-                                          Additionally subtracing one more than the number of strings because arrays are 0 indexed
+    funcMacros[i - (message_strings + 1)]();  /*Subtracting away the string numbers so that it correctly                                            finds the corresponding function in the array funcMacros. 
+                                          Additionally subtracing one more than the number of strings
+                                          because arrays are 0 indexed
 										 */
   }
 }
@@ -82,7 +104,7 @@ void setup() {
   pinMode(pinLed, OUTPUT);
   pinMode(pinLed2, OUTPUT);
   pinMode(pinLed3, OUTPUT);
-  Keyboard.begin();
+  Keyboard.begin(); //Initialize libraries
   BootKeyboard.begin();
   
 }
@@ -91,7 +113,7 @@ void setup() {
 void loop() {
   //led indecators
   if (BootKeyboard.getLeds()) {
-    digitalWrite(pinLed, (LED_CAPS_LOCK) ? HIGH : LOW); //basically, do something with a pin, here's the pin, check this variable (true, HIGH, false/else, LOW)
+    digitalWrite(pinLed, (LED_CAPS_LOCK) ? HIGH : LOW); //basically, do something with a pin, here's the pin,                                                   check this variable (true, HIGH, false/else, LOW)
     digitalWrite(pinLed2, (LED_NUM_LOCK) ? HIGH : LOW);
     digitalWrite(pinLed3, (LED_SCROLL_LOCK) ? HIGH : LOW);
   }
