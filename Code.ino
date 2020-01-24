@@ -18,7 +18,7 @@ byte colPins[COLS] = {5, 4, 3};
 const int message_strings = 6; //enter the amount of string entries you have 
 const int functions = 6; //enter the amount of functions you have
 
-/* to change your keymap, edit this. valid numbers are 0-5 for text, and 6-11 for functions. 
+/* to change your keymap, edit this. valid numbers are 1-(amount of strings) for text, and (amount of strings + amount of functions) for functions. 
 Simply follow the formulas to find which number you want to put. Function/String number can be found in the arrays. For functions, formula is 6 + function number
 For strings, the formula is the String number
 */
@@ -75,7 +75,7 @@ void RecordStop(){
   Keyboard.releaseAll();
 }
 // Function array, order your functions here, not super useful but if you need it it's here. Read the keymap for a better explanation
-void (*funcMacros[6])() {
+void (*funcMacros[])() {
   sleep, PsFill, VolumeUp, VolumeDown, Record, RecordStop
 };
 
