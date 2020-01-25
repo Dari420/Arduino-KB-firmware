@@ -30,19 +30,21 @@ bool LED_DelayState = false; //check if led clock is on or off, don't touch unle
 long previousMillis = 0; //previous millis value used for async functions
 	
 
-/*
-								NOT CONFIGURABLE, SKIP
-	***************************************************************************************************
-	customkey intilization. Skip this unless you know what you're doing 
+/*******************************************************************************************
+	|						  NOT CONFIGURABLE, SKIP                                                     |
+	******************************************************************************************
 */
+//customKey intilization
+
 //Making the button array
 Keypad customKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, ROWS, COLS);
 
 //Making customkey the result of what the keypad library gets
 int customKey = customKeypad.getKey();
 
-/*								NOT CONFIGURABLE ^ (unless you know what you're doing, then go ahead :^) )
-	****************************************************************************************************
+/*******************************************************************************************
+	|						NOT CONFIGURABLE ^ (unless you know what you're doing, then go ahead :^) )   |
+  ******************************************************************************************
 
 
 
