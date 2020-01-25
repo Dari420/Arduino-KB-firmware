@@ -107,7 +107,7 @@ void Macro(int i) {
  		Keyboard.print(messages[i - 1]); //minus 1 because arrays are zero-indexed
   	}
   	else if (i <= (message_strings + functions)) { //output is under or equivalent to the maxmimum amount of valid entries (functions + strings), so that there's no memory errors.
-    	funcMacros[i - (message_strings + 1)]();  /*Subtracting away the string numbers so that it correctly                                            finds the corresponding function in the array funcMacros. 
+    	funcMacros[i - (message_strings + 1)]();  /*Subtracting away the string numbers so that it correctly finds the corresponding function in the array funcMacros. 
                                           Additionally subtracing one more than the number of strings
                                           because arrays are 0 indexed
 										 */
