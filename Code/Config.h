@@ -1,5 +1,5 @@
 /*
-Configuration for the firmware, should be self explanatory for the most part
+Configuration for the firmware, don't be afraid to add or remove anything. Need help? add me on discord @Dari#3459 (case sensitive)
 */
 
 //LEDs
@@ -24,4 +24,3 @@ Configuration for the firmware, should be self explanatory for the most part
 #define CapsLED 10 //Pin for capslock LED
 #define NumLED 14 //Pin for numlock LED
 #define ScrollLED 15 //Pin for scrolllock LED
-
