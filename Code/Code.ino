@@ -28,6 +28,7 @@ byte colPins[COLS] = {5, 4, 3};
 CRGB leds[NUM_LEDS]; //initializing a block of memory to store the LEDS
 bool LED_DelayState = false; //check if led clock is on or off, don't touch unless you know what you're doing.
 long previousMillis = 0; //previous millis value used for async functions
+int currentLEDmode = 0;
 	
 
 /*******************************************************************************************
@@ -85,16 +86,16 @@ void VolumeUp() {
   	Keyboard.releaseAll();
 }
 
-void VolumeDown(){
+void VolumeDown() {
   	Keyboard.press(KEY_F23);
   	Keyboard.releaseAll();
 }
-void RecordStart(){
+void RecordStart() {
   	Keyboard.press(KEY_F22);
   	Keyboard.releaseAll();
 }
 
-void RecordStop(){
+void RecordStop() {
   	Keyboard.press(KEY_F21);
   	Keyboard.releaseAll();
 }
@@ -107,13 +108,23 @@ void (*funcMacros[])() {
 };
 
 /*
-	LED functions. Don't forget to include them in the main loop! 
+	LED functions. Don't forget to include them in the array!
 */
 
-void setLedSolidColour(){
+void setLEDPurple() {
   	fill_solid(LEDS, NUM_LEDS, CRGB(RED_0, GREEN_0, BLUE_0))
   	FastLED.show(); 
 }
+
+void setLEDWhite() {
+    fill_solid(LEDS, NUM_LEDS, CRGB(RED_1, GREEN_1, BLUE_1))
+    FastLED.show(); 
+}
+
+//LED mode array, order your functions in the order you want them cycled through.
+void (*LED_MODES[])() {
+    setLEDPurple, setLEDWhite
+};
 
 // anything after this is more technical, feel free to read
 
@@ -130,7 +141,29 @@ void Macro(int i) {
   }
 }
 
+void LED_CYCLE (int cycle) {
+    /*async led writes
+    essentially every millisecond it'll check when 30 milliseconds have passed since the last bool state change (first if statment).
+    once it does, it'll change it. Note it's refreshing the LEDs every 60 milliseconds instead of 30 because it's sees it's false, changes it to true (30ms).
+    then 30ms later, it'll check it, sees it's true, and set it. 30 + 30 = 60.
+     */
+    unsigned long currentMillis = millis(); //check milliseconds since program started
+    
+    if(currentMillis - previousMillis > interval) {
+        previousMillis = currentMillis; //Save last clock cycle
+
+        if(!LED_DelayState){
+            LED_DelayState = !LED_DelayState; //if false, set true
+        }
+        else {
+            LED_DelayState = !LED_DelayState; //if true, set false and set the LEDs
+            //put your solid led colour functions here
+            LED_MODES[cycle]();
+        }
+    }
+}
 void setup() {
+    pinMode(LED_TOGGLE, INPUT);
   	pinMode(CapsLED, OUTPUT);
   	pinMode(NumLED, OUTPUT);
   	pinMode(ScrollLED, OUTPUT);
@@ -143,7 +176,7 @@ void setup() {
 void loop() {
   //led indicators
   	if (BootKeyboard.getLeds()) {
-    	digitalWrite(CapsLED, (LED_CAPS_LOCK) ? HIGH : LOW); //basically, do something with a pin, here's the pin,                                                   check this variable (true, HIGH, false/else, LOW)
+    	digitalWrite(CapsLED, (LED_CAPS_LOCK) ? HIGH : LOW); //basically, do something with a pin, here's the pin, check this variable (true, HIGH, false/else, LOW)
     	digitalWrite(NumLED, (LED_NUM_LOCK) ? HIGH : LOW);
     	digitalWrite(ScrollLED, (LED_SCROLL_LOCK) ? HIGH : LOW);
   	}
@@ -152,23 +185,14 @@ void loop() {
     	Macro(customKey); //calls macro function with i being what customkey gives
     	delay(Debounce); //debounce5
   	}
-  	/*async led writes
-  	essentially every millisecond it'll check when 30 milliseconds have passed since the last bool state change (first if statment).
-	once it does, it'll change it. Note it's refreshing the LEDs every 60 milliseconds instead of 30 because it's sees it's false, changes it to true (30ms).
-	then 30ms later, it'll check it, sees it's true, and set it. 30 + 30 = 60.
-  	*/
-  	unsigned long currentMillis = millis(); //check milliseconds since program started
-  	
-  	if(currentMillis - previousMillis > interval) {
-  		previousMillis = currentMillis; //Save last clock cycle
 
-  		if(!LED_DelayState){
-  			LED_DelayState = !LED_DelayState; //if false, set true
-  		}
-  		else {
-  			LED_DelayState = !LED_DelayState; //if true, set false and set the LEDs
-  			//put your solid led colour functions here
-  			setLedSolidColour();
-  		}
-  	}
+    if (LED_TOGGLE == HIGH) {
+        if (currentLEDmode < NUM_MODES) {
+            currentLEDmode = currentLEDmode + 1;
+        }
+        else {
+            currentLEDmode = 0;
+        }
+    }
+    LED_CYCLE(currentLEDmode);
 }
