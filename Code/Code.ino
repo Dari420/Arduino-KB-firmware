@@ -183,7 +183,7 @@ void loop() {
 
   	if (customKey) {
     	Macro(customKey); //calls macro function with i being what customkey gives
-    	delay(Debounce); //debounce5
+    	delay(Debounce); //debounce
   	}
 
     if (LED_TOGGLE == HIGH) {
@@ -195,4 +195,5 @@ void loop() {
         }
     }
     LED_CYCLE(currentLEDmode);
+    delay(Debounce);
 }
