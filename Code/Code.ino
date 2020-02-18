@@ -8,9 +8,16 @@
 #include <FastLED.h>
 #include <config.h>
 
-/* to change your keymap, edit this. valid numbers are 1-(amount of strings) for text, and (amount of strings + amount of functions) for functions. 
-Simply follow the formulas to find which number you want to put. Function/String number can be found in the arrays. For functions, formula is 6 + function number
-For strings, the formula is the String number
+//LED cycle
+unsigned long currentMillis = millis(); //check milliseconds since program started
+CRGB leds[NUM_LEDS]; //initializing a block of memory to store the LEDS
+long previousMillisLED = 0; //previous millis value used for async functions
+int currentLEDmode = 0;
+
+/* 
+    to change your keymap, edit this. valid numbers are 1-(amount of strings) for text, and (amount of strings + amount of functions) for functions. 
+    Simply follow the formulas to find which number you want to put. Function/String number can be found in the arrays. For functions, formula is 6 + function number
+    For strings, the formula is the String number
 */
 char keymap[ROWS][COLS] { //Rows (Y) by Columns (X)
   	{'1', '2', '3'},
@@ -21,14 +28,8 @@ char keymap[ROWS][COLS] { //Rows (Y) by Columns (X)
 	Pins for your matrix, add/edit them here. You may also remove them.
 	Need help? https://www.arduino.cc/reference/en/language/variables/data-types/array/
 */
-byte rowPins[ROWS] = {9, 8}; 
-byte colPins[COLS] = {5, 4, 3};
-
-//LED cycle
-CRGB leds[NUM_LEDS]; //initializing a block of memory to store the LEDS
-bool LED_DelayState = false; //check if led clock is on or off, don't touch unless you know what you're doing.
-long previousMillis = 0; //previous millis value used for async functions
-int currentLEDmode = 0;
+byte rowPins[ROWS] = {ROWPIN1, ROWPIN2}; 
+byte colPins[COLS] = {COLPIN1, COLPIN2, COLPIN3};
 	
 
 /*******************************************************************************************
@@ -42,6 +43,9 @@ Keypad customKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, ROWS, COLS);
 
 //Making customkey the result of what the keypad library gets
 int customKey = customKeypad.getKey();
+
+bool isPressedMatrix false;
+bool isPressedLED false;
 
 /*******************************************************************************************
 	|						NOT CONFIGURABLE ^ (unless you know what you're doing, then go ahead :^) )   |
@@ -142,24 +146,13 @@ void Macro(int i) {
 }
 
 void LED_CYCLE (int cycle) {
-    /*async led writes
-    essentially every millisecond it'll check when 30 milliseconds have passed since the last bool state change (first if statment).
-    once it does, it'll change it. Note it's refreshing the LEDs every 60 milliseconds instead of 30 because it's sees it's false, changes it to true (30ms).
-    then 30ms later, it'll check it, sees it's true, and set it. 30 + 30 = 60.
+    /*
+        async led writes
+        essentially every millisecond it'll check when 30 milliseconds have passed since the last refresh. Doesn't use delay() to pause the entire script
      */
-    unsigned long currentMillis = millis(); //check milliseconds since program started
-    
-    if(currentMillis - previousMillis > interval) {
-        previousMillis = currentMillis; //Save last clock cycle
-
-        if(!LED_DelayState){
-            LED_DelayState = !LED_DelayState; //if false, set true
-        }
-        else {
-            LED_DelayState = !LED_DelayState; //if true, set false and set the LEDs
-            //put your solid led colour functions here
-            LED_MODES[cycle]();
-        }
+    if(currentMillis - previousMillisLED > interval) {
+        previousMillisLED = currentMillis; //Save last clock cycle
+        LED_MODES[cycle]();
     }
 }
 void setup() {
@@ -180,20 +173,29 @@ void loop() {
     	digitalWrite(NumLED, (LED_NUM_LOCK) ? HIGH : LOW);
     	digitalWrite(ScrollLED, (LED_SCROLL_LOCK) ? HIGH : LOW);
   	}
-
-  	if (customKey) {
-    	Macro(customKey); //calls macro function with i being what customkey gives
-    	delay(Debounce); //debounce
-  	}
-
-    if (LED_TOGGLE == HIGH) {
-        if (currentLEDmode < NUM_MODES) {
-            currentLEDmode = currentLEDmode + 1;
+    if (customkey) { //async writes
+        if (currentMillis - previousMillisLED > Debounce) {
+            previousMillisLED = currentMillis; //Save last clock cycle
+            Macro(customKey); //calls macro function with i being what customkey gives
         }
         else {
-            currentLEDmode = 0;
+            ();
         }
     }
-    LED_CYCLE(currentLEDmode);
-    delay(Debounce);
+
+    if (LED_TOGGLE == HIGH) {
+        if (currentMillis - previousMillisLED > Debounce) {
+            previousMillisLED = currentMillis; //Save last clock cycle
+            if (currentLEDmode < NUM_MODES) {
+            currentLEDmode = currentLEDmode + 1;
+            }
+            else {
+                currentLEDmode = 0;
+            }
+        }
+        else {
+            ();
+        }
+    }
+    LED_CYCLE(currentLEDmode); //Calling cycler to refresh what mode it's on
 }
