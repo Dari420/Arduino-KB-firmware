@@ -44,9 +44,6 @@ Keypad customKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, ROWS, COLS);
 //Making customkey the result of what the keypad library gets
 int customKey = customKeypad.getKey();
 
-bool isPressedMatrix false;
-bool isPressedLED false;
-
 /*******************************************************************************************
 	|						NOT CONFIGURABLE ^ (unless you know what you're doing, then go ahead :^) )   |
   ******************************************************************************************
