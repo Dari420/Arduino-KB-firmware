@@ -8,14 +8,14 @@
 #include <FastLED.h>
 
 /*
-Configuration for the firmware, don't be afraid to add or remove anything. Need help? add me on discord @Dari#3459 (case sensitive)
+  Configuration for the firmware, don't be afraid to add or remove anything. Need help? add me on discord @Dari#3459 (case sensitive)
 */
 
 //LEDs
 #define LED_TYPE WS2812B //Put the type of LED you're using
 #define NUM_LEDS 60 //Put the amount of LED's you have here
 #define LED_PIN 6 //Pin LED is going to connect to
-#define interval 30 //half of the time you want between each led refresh cycle\
+#define interval 30 //half of the time you want between each led refresh cycle
 #define NUM_MODES 2 //define the amount of led modes you have
 #define LED_TOGGLE 12 //pin for led cycle toggles
 
@@ -214,7 +214,7 @@ void loop() {
     	digitalWrite(NumLED, (LED_NUM_LOCK) ? HIGH : LOW);
     	digitalWrite(ScrollLED, (LED_SCROLL_LOCK) ? HIGH : LOW);
   	}
-    if (customkey) { //async writes
+    if (customKey) { //async writes
         if (currentMillis - previousMillisLED > Debounce) {
             previousMillisLED = currentMillis; //Save last clock cycle
             Macro(customKey); //calls macro function with i being what customkey gives
