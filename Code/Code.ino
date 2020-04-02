@@ -1,5 +1,5 @@
 /*
-  	Made by Dari#3459 on discord
+  	Made by Dari#5079 on discord
   	Keyboard firmware for HID capable arduino boards
 */
 
@@ -8,14 +8,14 @@
 #include <FastLED.h>
 
 /*
-  Configuration for the firmware, don't be afraid to add or remove anything. Need help? add me on discord @Dari#3459 (case sensitive)
+  Configuration for the firmware, don't be afraid to add or remove anything. Need help? add me on discord @Dari#5079 (case sensitive)
 */
 
 //LEDs
 #define LED_TYPE WS2812B //Put the type of LED you're using
 #define NUM_LEDS 60 //Put the amount of LED's you have here
 #define LED_PIN 6 //Pin LED is going to connect to
-#define interval 30 //half of the time you want between each led refresh cycle
+#define Interval 30 //half of the time you want between each led refresh cycle
 #define NUM_MODES 2 //define the amount of led modes you have
 #define LED_TOGGLE 12 //pin for led cycle toggles
 
@@ -52,14 +52,8 @@
 #define NumLED 14 //Pin for numlock LED
 #define ScrollLED 15 //Pin for scrolllock LED
 
-//LED cycle
-unsigned long currentMillis = millis(); //check milliseconds since program started
-CRGB leds[NUM_LEDS]; //initializing a block of memory to store the LEDS
-long previousMillisLED = 0; //previous millis value used for async functions
-int currentLEDmode = 0;
-
 /* 
-    to change your keymap, edit this. valid numbers are 1-(amount of strings) for text, and (amount of strings + amount of functions) for functions. 
+    to change your keymap, edit this. 
     Simply follow the formulas to find which number you want to put. Function/String number can be found in the arrays. For functions, formula is 6 + function number
     For strings, the formula is the String number
 */
@@ -69,10 +63,10 @@ char keymap[ROWS][COLS] { //Rows (Y) by Columns (X)
 };
 
 /*
-	Pins for your matrix, add/edit them here. You may also remove them.
+	Pins for your matrix, add/remove them here
 	Need help? https://www.arduino.cc/reference/en/language/variables/data-types/array/
 */
-byte rowPins[ROWS] = {ROWPIN1, ROWPIN2}; 
+byte rowPins[ROWS] = {ROWPIN1, ROWPIN2};
 byte colPins[COLS] = {COLPIN1, COLPIN2, COLPIN3};
 	
 
@@ -88,6 +82,13 @@ Keypad customKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, ROWS, COLS);
 //Making customkey the result of what the keypad library gets
 int customKey = customKeypad.getKey();
 
+//LED cycle
+unsigned long currentMillis = millis(); //check milliseconds since program started
+CRGB leds[NUM_LEDS]; //initializing a block of memory to store the leds
+long previousMillisLED = 0; //previous millis value used for async functions
+int currentLEDmode = 0;
+
+
 /*******************************************************************************************
 	|						NOT CONFIGURABLE ^ (unless you know what you're doing, then go ahead :^) )   |
   ******************************************************************************************
@@ -101,13 +102,22 @@ int customKey = customKeypad.getKey();
 
 //Text strings
 String messages[] = {
-  	"String1", 
-  	"String2", 
-  	"String3", 
+  	"String1", //string 1
+  	"String2", //string 2
+  	"String3", //etc
   	"String4", 
   	"String5", 
   	"String6"
  };
+ 
+/*
+  Function config. Don't forget to include them in the array!
+*/
+
+//Function array, order your functions here so you can use them in the keymap above
+void (*funcMacros[])() {
+    sleep, PsFill, VolumeUp, VolumeDown, RecordStart, RecordStop
+};
 
 //Functions, create/edit them here.
 void sleep() {
@@ -144,32 +154,26 @@ void RecordStop() {
   	Keyboard.press(KEY_F21);
   	Keyboard.releaseAll();
 }
-/*
-	Don't forget to include the function here!
-	Function array, order your functions here so you can use them in the keymap above
-*/
-void (*funcMacros[])() {
-  	sleep, PsFill, VolumeUp, VolumeDown, RecordStart, RecordStop
-};
 
 /*
 	LED functions. Don't forget to include them in the array!
 */
 
-void setLEDPurple() {
-  	fill_solid(LEDS, NUM_LEDS, CRGB(RED_0, GREEN_0, BLUE_0))
-  	FastLED.show(); 
-}
-
-void setLEDWhite() {
-    fill_solid(LEDS, NUM_LEDS, CRGB(RED_1, GREEN_1, BLUE_1))
-    FastLED.show(); 
-}
-
 //LED mode array, order your functions in the order you want them cycled through.
 void (*LED_MODES[])() {
     setLEDPurple, setLEDWhite
 };
+
+//LED functions, create/edit them here.
+void setLEDPurple() {
+  	fill_solid(leds, NUM_LEDS, CRGB(RED_0, GREEN_0, BLUE_0));
+  	FastLED.show(); 
+}
+
+void setLEDWhite() {
+    fill_solid(leds, NUM_LEDS, CRGB(RED_1, GREEN_1, BLUE_1));
+    FastLED.show(); 
+}
 
 // anything after this is more technical, feel free to read
 
@@ -191,11 +195,12 @@ void LED_CYCLE (int cycle) {
         async led writes
         essentially every millisecond it'll check when 30 milliseconds have passed since the last refresh. Doesn't use delay() to pause the entire script
      */
-    if(currentMillis - previousMillisLED > interval) {
+    if(currentMillis - previousMillisLED > Interval) {
         previousMillisLED = currentMillis; //Save last clock cycle
         LED_MODES[cycle]();
     }
 }
+
 void setup() {
     pinMode(LED_TOGGLE, INPUT);
   	pinMode(CapsLED, OUTPUT);
@@ -203,9 +208,8 @@ void setup() {
   	pinMode(ScrollLED, OUTPUT);
   	Keyboard.begin(); //Initialize libraries
   	BootKeyboard.begin();
-  	FastLED.addLeds<LED_TYPE, DATA_PIN>(LEDS, NUM_LEDS);
+  	FastLED.addLeds<LED_TYPE, LED_PIN, RGB>(leds, NUM_LEDS);
 }
-
 
 void loop() {
   //led indicators
@@ -220,7 +224,6 @@ void loop() {
             Macro(customKey); //calls macro function with i being what customkey gives
         }
         else {
-            ();
         }
     }
 
@@ -235,7 +238,6 @@ void loop() {
             }
         }
         else {
-            ();
         }
     }
     LED_CYCLE(currentLEDmode); //Calling cycler to refresh what mode it's on
