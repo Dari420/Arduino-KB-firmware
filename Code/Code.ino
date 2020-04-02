@@ -231,7 +231,7 @@ void loop() {
         if (currentMillis - previousMillisLED > Debounce) {
             previousMillisLED = currentMillis; //Save last clock cycle
             if (currentLEDmode < NUM_MODES) {
-            currentLEDmode = currentLEDmode + 1;
+                currentLEDmode = currentLEDmode + 1;
             }
             else {
                 currentLEDmode = 0;
