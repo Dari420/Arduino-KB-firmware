@@ -1,5 +1,5 @@
 /*
-  	Made by Dari#7203 on discord
+  	Made by Dari#5079 on discord
   	Keyboard firmware for HID capable arduino boards
 */
 
